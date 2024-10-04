@@ -1,16 +1,20 @@
 name: flutter_veepoo_sdk_android
 description: "Veepoo SDK Smartwatch for Flutter."
 version: 0.0.1
-homepage: https://www.pandawa.xyz
 repository: https://github.com/arifai/flutter_veepoo_sdk
 issue_tracker: https://github.com/arifai/flutter_veepoo_sdk/issues
-topics: [smartwatch, veepoo, bluetooth, ble]
+topics: 
+  - bluetooth 
+  - ble 
+  - smartwatch 
+  - veepoo
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
   flutter: '>=3.3.0'
 
 dependencies:
+  equatable: ^2.0.5
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
@@ -24,5 +28,5 @@ flutter:
   plugin:
     platforms:
       android:
-        package: xyz.pandawa.flutter_veepoo_sdk_android
+        package: site.shasmatic.flutter_veepoo_sdk_android
         pluginClass: FlutterVeepooSdkAndroidPlugin

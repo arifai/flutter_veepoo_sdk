@@ -1,27 +1,40 @@
-package xyz.pandawa.flutter_veepoo_sdk_android
+package site.shasmatic.flutter_veepoo_sdk_android
 
 import android.app.Activity
-import android.content.Context
+import com.veepoo.protocol.VPOperateManager
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
+import site.shasmatic.flutter_veepoo_sdk_android.utils.DeviceStorageUtil
 
 /** FlutterVeepooSdkAndroidPlugin */
 class FlutterVeepooSdkAndroidPlugin : FlutterPlugin, ActivityAware {
     private lateinit var channel: MethodChannel
     private lateinit var methodChannelHandler: MethodChannelHandler
+    private lateinit var deviceStorageUtil: DeviceStorageUtil
+    private var vpManager: VPOperateManager? = null
+
+    init {
+        vpManager = VPOperateManager.getInstance()
+    }
 
     companion object {
         private const val COMMAND_CHANNEL: String = "flutter_veepoo_sdk/command"
-        private const val EVENT_CHANNEL: String = "flutter_veepoo_sdk/event"
+        private const val SCAN_BLUETOOTH_EVENT_CHANNEL: String =
+            "flutter_veepoo_sdk/scan_bluetooth_event_channel"
+        private const val DETECT_HEART_EVENT_CHANNEL: String =
+            "flutter_veepoo_sdk/detect_heart_event_channel"
     }
 
+
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        deviceStorageUtil = DeviceStorageUtil(flutterPluginBinding.applicationContext)
+        vpManager?.init(flutterPluginBinding.applicationContext)
         startListening(
-            flutterPluginBinding.applicationContext, flutterPluginBinding.binaryMessenger
+            flutterPluginBinding.binaryMessenger
         )
     }
 
@@ -45,18 +58,29 @@ class FlutterVeepooSdkAndroidPlugin : FlutterPlugin, ActivityAware {
         stopListeningActivity()
     }
 
-    private fun startListening(appContext: Context, messenger: BinaryMessenger) {
+    private fun startListening(messenger: BinaryMessenger) {
         channel = MethodChannel(messenger, COMMAND_CHANNEL)
-        methodChannelHandler = MethodChannelHandler(appContext)
+        methodChannelHandler = MethodChannelHandler(vpManager!!, deviceStorageUtil)
 
-        EventChannel(messenger, EVENT_CHANNEL).setStreamHandler(object :
+        EventChannel(messenger, SCAN_BLUETOOTH_EVENT_CHANNEL).setStreamHandler(object :
             EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
-                methodChannelHandler.setEventSink(events)
+                methodChannelHandler.scanBluetoothEventSink(events)
             }
 
             override fun onCancel(arguments: Any?) {
-                methodChannelHandler.setEventSink(null)
+                methodChannelHandler.scanBluetoothEventSink(null)
+            }
+        })
+
+        EventChannel(messenger, DETECT_HEART_EVENT_CHANNEL).setStreamHandler(object :
+            EventChannel.StreamHandler {
+            override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
+                methodChannelHandler.detectHeartEventSink(events)
+            }
+
+            override fun onCancel(arguments: Any?) {
+                methodChannelHandler.detectHeartEventSink(null)
             }
         })
 

@@ -1,4 +1,4 @@
-package xyz.pandawa.flutter_veepoo_sdk_android
+package site.shasmatic.flutter_veepoo_sdk_android
 
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -16,7 +16,7 @@ import org.mockito.Mockito
 internal class FlutterVeepooSdkAndroidPluginTest {
   @Test
   fun onMethodCall_getPlatformVersion_returnsExpectedValue() {
-    val plugin = FlutterVeepooSdkAndroidPlugin()
+    val plugin = FlutterVeepooSdkAndroidPlugin<Any>()
 
     val call = MethodCall("getPlatformVersion", null)
     val mockResult: MethodChannel.Result = Mockito.mock(MethodChannel.Result::class.java)
